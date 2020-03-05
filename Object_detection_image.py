@@ -17,6 +17,7 @@
 
 # Import packages
 import os
+#os.environ['CUDA_VISIBLE_DEVICES']='1'
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -67,7 +68,9 @@ with detection_graph.as_default():
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')
 
-    sess = tf.compat.v1.Session(graph=detection_graph)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5) 
+   #sess = tf.compat.v1.Session(graph=detection_graph)
+    sess = tf.compat.v1.Session(graph=detection_graph,config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
 
 # Define input and output tensors (i.e. data) for the object detection classifier
 
@@ -114,7 +117,7 @@ for file in os.listdir(IMAGE_DIR_NAME):
       category_index,
       use_normalized_coordinates=True,
       line_thickness=4,
-      min_score_thresh=0.90)
+      min_score_thresh=0.40)
 
   # All the results have been drawn on image. Now display the image.
   cv2.imshow('Object detector', image)
