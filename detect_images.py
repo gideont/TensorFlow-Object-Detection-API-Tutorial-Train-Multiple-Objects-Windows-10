@@ -17,11 +17,17 @@
 
 # Import packages
 import os
-#os.environ['CUDA_VISIBLE_DEVICES']='1'
+os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'} to supress warnings
 import cv2
 import numpy as np
 import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+import logging
+logging.getLogger('tensorflow').setLevel(logging.FATAL)
 import sys
+import time
 
 # This is needed since the notebook is stored in the object_detection folder.
 sys.path.append("..")
@@ -68,9 +74,12 @@ with detection_graph.as_default():
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')
 
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5) 
-   #sess = tf.compat.v1.Session(graph=detection_graph)
-    sess = tf.compat.v1.Session(graph=detection_graph,config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
+    # CPU only
+    # sess = tf.compat.v1.Session(graph=detection_graph)
+
+    # GPU options to avoid GPU out-of-memory crash
+    gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.5) 
+    sess = tf.compat.v1.Session(graph=detection_graph,config=tf.compat.v1.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
 
 # Define input and output tensors (i.e. data) for the object detection classifier
 
@@ -91,8 +100,9 @@ num_detections = detection_graph.get_tensor_by_name('num_detections:0')
 
 # Loop to process all image files in test image directory
 for file in os.listdir(IMAGE_DIR_NAME):
-  print(file)
+  #print(file)
 
+  start = time.time()
   # Load image using OpenCV and
   # expand image dimensions to have shape: [1, None, None, 3]
   # i.e. a single-column array, where each item in the column has the pixel RGB value
@@ -119,6 +129,8 @@ for file in os.listdir(IMAGE_DIR_NAME):
       line_thickness=4,
       min_score_thresh=0.40)
 
+  end = time.time()
+  print(end - start)
   # All the results have been drawn on image. Now display the image.
   cv2.imshow('Object detector', image)
 
