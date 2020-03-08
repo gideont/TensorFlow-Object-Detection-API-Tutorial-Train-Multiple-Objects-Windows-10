@@ -10,6 +10,6 @@ $ python3 detect_images.py
 
 To start inference using webcam:
 ```console
-python3 detect_webcam.py
+$ python3 detect_webcam.py
 ```
 
