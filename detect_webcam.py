@@ -20,10 +20,14 @@
 # Import packages
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"  # specify which GPU(s) to be used
+os.environ["CUDA_VISIBLE_DEVICES"]="1"  # specify which GPU(s) to be used
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'} to supress warnings
 import cv2
 import numpy as np
 import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+import logging
+logging.getLogger('tensorflow').setLevel(logging.FATAL)
 import sys
 
 # This is needed since the notebook is stored in the object_detection folder.
