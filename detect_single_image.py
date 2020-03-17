@@ -44,6 +44,12 @@ IMAGE_RESULT_NAME = 'test_result.jpg'
 # Grab path to current working directory
 CWD_PATH = os.getcwd()
 
+# patch tf1 into `utils.ops`
+#utils_ops.tf = tf.compat.v1
+
+# Patch the location of gfile
+tf.gfile = tf.io.gfile
+
 # Path to frozen detection graph .pb file, which contains the model that is used
 # for object detection.
 PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
@@ -80,7 +86,9 @@ with detection_graph.as_default():
 
     # GPU options to avoid GPU out-of-memory crash
     #gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.5) 
-    gpu_options = tf.GPUOptions(allow_growth = True)
+    #gpu_options = tf.GPUOptions(allow_growth = True)
+    # for tf2
+    gpu_options = tf.compat.v1.GPUOptions(allow_growth = True)
     sess = tf.compat.v1.Session(graph=detection_graph,config=tf.compat.v1.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
 
 # Define input and output tensors (i.e. data) for the object detection classifier
